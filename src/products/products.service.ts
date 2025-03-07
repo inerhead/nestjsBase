@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -12,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
+import { handleDBExceptions } from 'src/common/helpers/exceptions';
 
 @Injectable()
 export class ProductsService {
@@ -37,7 +32,7 @@ export class ProductsService {
       await this.productRepository.save(product);
       return this.plainProductImages(product);
     } catch (error) {
-      this.handleDBExceptions(error);
+      handleDBExceptions(error);
     }
   }
 
@@ -106,7 +101,7 @@ export class ProductsService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
-      this.handleDBExceptions(error);
+      handleDBExceptions(error);
     }
   }
 
@@ -114,15 +109,6 @@ export class ProductsService {
     const data = await this.productRepository.update(id, { active: false });
     if (data.affected) return { message: 'Product inactived' };
     return { message: `Product with id: ${id} not found` };
-  }
-
-  private handleDBExceptions(error: any) {
-    if (error.code === '23505') throw new BadRequestException(error.detail);
-    if (error.code === '23502') throw new BadRequestException(error.message);
-
-    throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
-    );
   }
 
   private plainProductImages(product: Product) {
@@ -138,7 +124,7 @@ export class ProductsService {
       // return await query.delete().where({ active: false }).execute();
       return await query.delete().where({}).execute();
     } catch (error) {
-      this.handleDBExceptions(error);
+      handleDBExceptions(error);
     }
   }
 }
