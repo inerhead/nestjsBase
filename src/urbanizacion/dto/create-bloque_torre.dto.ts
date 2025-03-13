@@ -1,4 +1,5 @@
-import { IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsOptional, IsString, MinLength } from 'class-validator';
+import { CreateAptoDto } from './create-apto.dto';
 
 export class CreateBloqueTorreDto {
   @IsString()
@@ -8,4 +9,8 @@ export class CreateBloqueTorreDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsArray()
+  @IsOptional()
+  aptos?: CreateAptoDto[];
 }

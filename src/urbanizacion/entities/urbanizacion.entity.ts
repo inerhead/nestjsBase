@@ -16,7 +16,7 @@ export class Urbanizacion extends BaseEntity {
   @Column('boolean', { default: true })
   active: boolean;
 
-  @OneToMany(() => BloqueTorre, (bt) => bt.urbanizacionid, {
+  @OneToMany(() => BloqueTorre, (bt) => bt.urbanizacion, {
     cascade: true,
     eager: true,
   })

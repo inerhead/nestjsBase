@@ -89,7 +89,7 @@ export class UrbanizacionService {
 
     try {
       urban.bloqueTorres = await this.bloqueTorreRepository.findBy({
-        urbanizacionid: { id },
+        urbanizacion: { id },
       });
       await queryRunner.manager.save(urban);
       await queryRunner.commitTransaction();

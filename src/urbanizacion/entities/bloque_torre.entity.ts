@@ -1,5 +1,5 @@
-import { Entity, Column, ManyToOne, BeforeInsert } from 'typeorm';
-import { Urbanizacion } from './';
+import { Entity, Column, ManyToOne, BeforeInsert, OneToMany } from 'typeorm';
+import { Apto, Urbanizacion } from './';
 import { BaseEntity } from 'src/common/entity/base';
 
 @Entity({ name: 'bloquestorres' })
@@ -13,10 +13,16 @@ export class BloqueTorre extends BaseEntity {
   @Column('boolean', { default: true })
   active: boolean;
 
+  @OneToMany(() => Apto, (ap) => ap.bloqueTorre, {
+    cascade: true,
+    eager: true,
+  })
+  aptos?: Apto[];
+
   @ManyToOne(() => Urbanizacion, (urban) => urban.bloqueTorres, {
     onDelete: 'CASCADE',
   })
-  urbanizacionid: Urbanizacion;
+  urbanizacion: Urbanizacion;
 
   @BeforeInsert()
   generateCode() {
