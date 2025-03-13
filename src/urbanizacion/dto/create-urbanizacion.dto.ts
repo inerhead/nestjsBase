@@ -1,4 +1,5 @@
-import { IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsOptional, IsString, MinLength } from 'class-validator';
+import { CreateBloqueTorreDto } from './create-bloque_torre.dto';
 
 export class CreateUrbanizacionDto {
   @IsString()
@@ -12,4 +13,8 @@ export class CreateUrbanizacionDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsArray()
+  @IsOptional()
+  bloqueTorres?: CreateBloqueTorreDto[];
 }

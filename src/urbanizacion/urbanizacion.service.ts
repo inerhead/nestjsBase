@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUrbanizacionDto } from './dto/create-urbanizacion.dto';
 import { UpdateUrbanizacionDto } from './dto/update-urbanizacion.dto';
 import { Urbanizacion } from './entities/urbanizacion.entity';
@@ -7,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { validate as isUUID } from 'uuid';
 import { handleDBExceptions } from 'src/common/helpers/exceptions';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { BloqueTorre } from './entities';
 
 @Injectable()
 export class UrbanizacionService {
@@ -15,13 +21,18 @@ export class UrbanizacionService {
   constructor(
     @InjectRepository(Urbanizacion)
     private readonly urbanizacionRepository: Repository<Urbanizacion>,
+    @InjectRepository(BloqueTorre)
+    private readonly bloqueTorreRepository: Repository<BloqueTorre>,
     private readonly dataSource: DataSource,
   ) {}
   async create(createUrbanizacionDto: CreateUrbanizacionDto) {
     try {
-      const { ...urbDetails } = createUrbanizacionDto;
+      const { bloqueTorres = [], ...urbDetails } = createUrbanizacionDto;
       const urban = this.urbanizacionRepository.create({
         ...urbDetails,
+        bloqueTorres: bloqueTorres.map((bloque) =>
+          this.bloqueTorreRepository.create({ ...bloque }),
+        ),
       });
       const newRecord = await this.urbanizacionRepository.save(urban);
       return newRecord;
@@ -35,8 +46,8 @@ export class UrbanizacionService {
     const urbans = await this.urbanizacionRepository.find({
       take: limit,
       skip: offset,
-      where: { active: !!active },
-      relations: {},
+      where: { active: active === 1 },
+      relations: { bloqueTorres: true },
     });
     return urbans;
   }
@@ -48,10 +59,10 @@ export class UrbanizacionService {
     } else {
       const queryBuilder = this.urbanizacionRepository.createQueryBuilder();
       urban = await queryBuilder
-        .where('UPPER(name) =:name or UPPER(code) =:code', {
-          name: term.toUpperCase(),
+        .where('UPPER(code) =:code', {
           code: term.toUpperCase(),
         })
+        .leftJoinAndSelect('Urbanizacion.bloqueTorres', 'torres')
         .getOne();
     }
     return (
@@ -61,8 +72,10 @@ export class UrbanizacionService {
   }
 
   async update(id: string, updateUrbanizacionDto: UpdateUrbanizacionDto) {
-    const { ...toUpdateProduct } = updateUrbanizacionDto;
-
+    const { bloqueTorres, ...toUpdateProduct } = updateUrbanizacionDto;
+    if (bloqueTorres?.length > 0) {
+      throw new BadRequestException('Use endpoint to update bloqueTorres');
+    }
     const urban = await this.urbanizacionRepository.preload({
       id: id,
       ...toUpdateProduct,
@@ -75,6 +88,9 @@ export class UrbanizacionService {
     await queryRunner.startTransaction();
 
     try {
+      urban.bloqueTorres = await this.bloqueTorreRepository.findBy({
+        urbanizacionid: { id },
+      });
       await queryRunner.manager.save(urban);
       await queryRunner.commitTransaction();
       await queryRunner.release();
@@ -89,6 +105,7 @@ export class UrbanizacionService {
   async remove(id: string) {
     const data = await this.urbanizacionRepository.update(id, {
       active: false,
+      deletedAt: new Date(),
     });
     if (data.affected) return { message: 'Urbanización inactived' };
     return { message: `Urbanización with id: ${id} not found` };

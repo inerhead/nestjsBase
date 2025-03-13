@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common/entity/base';
+import { BloqueTorre } from './';
 
 @Entity({ name: 'urbanizaciones' })
 export class Urbanizacion extends BaseEntity {
@@ -14,4 +15,10 @@ export class Urbanizacion extends BaseEntity {
 
   @Column('boolean', { default: true })
   active: boolean;
+
+  @OneToMany(() => BloqueTorre, (bt) => bt.urbanizacionid, {
+    cascade: true,
+    eager: true,
+  })
+  bloqueTorres?: BloqueTorre[];
 }
