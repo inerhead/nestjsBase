@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   PrimaryGeneratedColumn,
@@ -17,4 +18,7 @@ export class BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt!: Date;
+
+  @Column('boolean', { default: true })
+  active: boolean;
 }

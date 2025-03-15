@@ -13,9 +13,6 @@ export class Urbanizacion extends BaseEntity {
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('boolean', { default: true })
-  active: boolean;
-
   @OneToMany(() => BloqueTorre, (bt) => bt.urbanizacion, {
     cascade: true,
     eager: true,

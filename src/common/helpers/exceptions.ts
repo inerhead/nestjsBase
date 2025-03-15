@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 
-export const handleDBExceptions = (error: any) => {
+export const handleDBExceptions = (error: any): never => {
   if (error.code === '23505') throw new BadRequestException(error.detail);
   if (error.code === '23502') throw new BadRequestException(error.message);
 

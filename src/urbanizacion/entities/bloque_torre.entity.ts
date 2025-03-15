@@ -10,9 +10,6 @@ export class BloqueTorre extends BaseEntity {
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('boolean', { default: true })
-  active: boolean;
-
   @OneToMany(() => Apto, (ap) => ap.bloqueTorre, {
     cascade: true,
     eager: true,

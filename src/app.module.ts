@@ -6,6 +6,7 @@ import { CommonModule } from './common/common.module';
 import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { UrbanizacionModule } from './urbanizacion/urbanizacion.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UrbanizacionModule } from './urbanizacion/urbanizacion.module';
     SeedModule,
     FilesModule,
     UrbanizacionModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
