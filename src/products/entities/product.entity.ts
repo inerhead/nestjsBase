@@ -5,8 +5,10 @@ import {
   BeforeInsert,
   BeforeUpdate,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { ProductImage } from './';
+import { User } from 'src/auth/entities/user.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -45,6 +47,9 @@ export class Product {
 
   @Column('boolean', { default: true })
   active: boolean;
+
+  @ManyToOne(() => User, (user) => user.products)
+  ownerid: User;
 
   @BeforeInsert()
   generateSlug() {

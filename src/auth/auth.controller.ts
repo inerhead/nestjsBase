@@ -5,11 +5,10 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser, GetRawHeaders } from './decorator/custom.dec';
 import { User } from './entities/user.entity';
-import { UserRoleGuard } from './guards/user-role/user-role.guard';
-import {
-  RoleProtected,
-  ValidRolesEnum,
-} from './decorator/role-protected.decorator';
+import { UserRoleGuard } from './guards/user-role.guard';
+import { RoleProtected } from './decorator/role-protected.decorator';
+import { Auth } from './decorator/auth';
+import { ValidRolesEnum } from './decorator/roles.enum';
 // import { UpdateAuthDto } from './dto/update-auth.dto';
 
 @Controller('auth')
@@ -24,6 +23,12 @@ export class AuthController {
   @Post('login')
   loginUser(@Body() loginUserDto: LoginUserDto) {
     return this.authService.login(loginUserDto);
+  }
+
+  @Get('checkStatus')
+  @Auth()
+  checkAuthStatus(@GetUser() user: User) {
+    return this.authService.checkStatus(user);
   }
 
   @Get('private')
@@ -43,10 +48,19 @@ export class AuthController {
   }
 
   @Get('private2')
-  @RoleProtected(AuthService, ValidRolesEnum.ADMIN, ValidRolesEnum.USER)
+  @RoleProtected(ValidRolesEnum.ADMIN, ValidRolesEnum.USER)
   //@SetMetadata(META_ROLES, ['admin', 'user'])
   @UseGuards(AuthGuard(), UserRoleGuard)
   privateRoute2(@GetUser() user: User) {
+    return {
+      user: user,
+      message: 'This is a private route',
+    };
+  }
+
+  @Get('private3')
+  @Auth()
+  privateRoute3(@GetUser() user: User) {
     return {
       user: user,
       message: 'This is a private route',

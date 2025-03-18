@@ -44,7 +44,7 @@ export class AuthService {
     // const salt = await bcrypt.genSalt(10);
 
     const user = await this.userRepository.findOne({
-      where: { email },
+      where: { email: email.toLowerCase() },
       select: { password: true, email: true, id: true },
     });
 
@@ -57,6 +57,13 @@ export class AuthService {
       token: this.getJwtToken({ userId: user.id }),
     };
     // TODO retornar JWT de acceso DONE.
+  }
+
+  async checkStatus(user: User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ userId: user.id }),
+    };
   }
 
   private getJwtToken(payload: IJwtPayload) {

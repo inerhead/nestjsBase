@@ -1,5 +1,6 @@
 import { BaseEntity } from 'src/common/entity/base';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { Product } from 'src/products/entities';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -14,6 +15,11 @@ export class User extends BaseEntity {
 
   @Column('text', { array: true, default: ['user'] })
   roles: string[];
+
+  @OneToMany(() => Product, (product) => product.ownerid, {
+    eager: false,
+  })
+  products: Product[];
 
   @BeforeInsert()
   emailToLowerCase() {

@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { META_ROLES } from 'src/auth/decorator/role-protected.decorator';
 import { User } from 'src/auth/entities/user.entity';
+import { META_ROLES } from '../decorator/roles.enum';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
@@ -26,7 +26,7 @@ export class UserRoleGuard implements CanActivate {
     const hasRole = () => user.roles.some((role) => validRoles.includes(role));
     console.log({ validRoles, user });
 
-    if (hasRole()) return true;
+    if (hasRole() || validRoles?.length == 0) return true;
 
     throw new ForbiddenException(
       `You do not have permission to access this route, you need a valid role: ${validRoles}`,
