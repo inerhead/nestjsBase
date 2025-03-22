@@ -7,12 +7,16 @@ import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { UrbanizacionModule } from './urbanizacion/urbanizacion.module';
 import { AuthModule } from './auth/auth.module';
+import { MessagesWsModule } from './messages-ws/messages-ws.module';
+import { enviroments } from './enviroments';
+import config from './config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      load: [config],
+      envFilePath: enviroments[process.env.NODE_ENV] || '.env',
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -30,6 +34,7 @@ import { AuthModule } from './auth/auth.module';
     FilesModule,
     UrbanizacionModule,
     AuthModule,
+    MessagesWsModule,
   ],
   controllers: [],
   providers: [],

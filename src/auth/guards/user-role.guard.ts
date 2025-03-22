@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { User } from 'src/auth/entities/user.entity';
 import { META_ROLES } from '../decorator/roles.enum';
+import { Request } from 'express';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
@@ -16,7 +17,7 @@ export class UserRoleGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<Request>();
     const validRoles: string[] = this.reflector.get<string[]>(
       META_ROLES,
       context.getHandler(),

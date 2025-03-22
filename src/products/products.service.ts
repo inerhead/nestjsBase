@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -8,6 +8,8 @@ import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
 import { handleDBExceptions } from 'src/common/helpers/exceptions';
 import { User } from 'src/auth/entities/user.entity';
+import config from 'src/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class ProductsService {
@@ -19,10 +21,13 @@ export class ProductsService {
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
     private readonly dataSource: DataSource,
+    @Inject(config.KEY)
+    private readonly configService: ConfigType<typeof config>,
   ) {}
 
   async create(createProductDto: CreateProductDto, user: User) {
     try {
+      console.log(this.configService.mysql);
       console.log(user);
       const { images = [], ...productDetails } = createProductDto;
       const product = this.productRepository.create({
